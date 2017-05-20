@@ -115,8 +115,12 @@ int main(){
 	readReservations(airShuttle);
 	readVans(airShuttle);
 	airShuttle.distributePassengers();
+	clock_t begin = clock();
 	for(unsigned int i=0; i < airShuttle.getVans().size(); i++ )
 		airShuttle.sortDistributions(g,i+1);
+	clock_t end = clock();
+	double elapsed = double(end - begin) / CLOCKS_PER_SEC;
+	cout << "Elapsed time: " << setprecision(10) << elapsed << endl;
 	mainMenu();
 	return 0;
 }

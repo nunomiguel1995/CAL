@@ -35,6 +35,7 @@ class Vertex {
 	bool processing;
 	int indegree;
 	int dist;
+	double heuristic;
 public:
 
 	Vertex(N in);
@@ -107,7 +108,8 @@ public:
 	vector<N> getPath(const N &origin, const N &dest);
 	void unweightedShortestPath(const N &v);
 	bool isDAG();
-	void dijkstraShortestPath(const N &s);
+	void dijkstraShortestPath(const N &initial);
+	void aStarPath(const N &initial, const N &final);
 };
 
 /*
@@ -580,6 +582,68 @@ void Graph<N,R>::dijkstraShortestPath(const N &s) {
 				{
 					w->processing = true;
 					pq.push_back(w);
+				}
+
+				make_heap (pq.begin(),pq.end(),vertex_greater_than<N,R>());
+			}
+		}
+	}
+}
+
+template<class N, class R>
+void Graph<N,R>::aStarPath(const N &initial, const N &final) {
+
+	for(unsigned int i = 0; i < vertexSet.size(); i++) {
+		vertexSet[i]->path = NULL;
+		vertexSet[i]->dist = INT_INFINITY;
+		vertexSet[i]->processing = false;
+	}
+
+	Vertex<N,R>* f = getVertex(final);
+
+	Vertex<N,R>* v = getVertex(initial);
+	v->dist = 0;
+
+	int dx = abs(v->getInfo().getPointDegree().getX() - f->getInfo().getPointDegree().getX());
+	int dy = abs(v->getInfo().getPointDegree().getY() - f->getInfo().getPointDegree().getY());
+	v->heuristic = sqrt(dx*dx + dy*dy);
+
+	vector< Vertex<N,R>* > pq;
+	pq.push_back(v);
+
+	make_heap(pq.begin(), pq.end());
+
+
+	while( !pq.empty() ) {
+
+		v = pq.front();
+		pop_heap(pq.begin(), pq.end());
+		pq.pop_back();
+
+		for(unsigned int i = 0; i < v->adj.size(); i++) {
+			Vertex<N,R>* w = v->adj[i].dest;
+
+			int dx = abs(f->getInfo().getPointDegree().getX() - w->getInfo().getPointDegree().getX());
+			int dy = abs(f->getInfo().getPointDegree().getY() - w->getInfo().getPointDegree().getY());
+			w->heuristic = sqrt(dx*dx + dy*dy);
+
+			if(v->dist + v->adj[i].weight < w->dist) {
+
+				//cout << "cost = " << v->dist + v->adj[i].weight << endl << "heuristic= " << v->heuristic;
+
+				w->dist = v->dist + v->adj[i].weight + v->heuristic;
+				w->path = v;
+
+				//se já estiver na lista, apenas a actualiza
+				if(!w->processing)
+				{
+					w->processing = true;
+					pq.push_back(w);
+
+					/*if(w == f){
+						make_heap (pq.begin(),pq.end(),vertex_greater_than<N,R>());
+						return;
+					}*/
 				}
 
 				make_heap (pq.begin(),pq.end(),vertex_greater_than<N,R>());

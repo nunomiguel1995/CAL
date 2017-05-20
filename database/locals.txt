@@ -1,0 +1,8 @@
+1;Aeroporto
+2;Hotel Premium Porto Aeroporto
+3;Hotel Star inn
+4;BessaHotel Boavista
+5;Intercontinental Porto
+6;Hotel Vila Gale Porto
+7;Hotel Portas de Santa Rita
+8;Hotel Porto-Mar
